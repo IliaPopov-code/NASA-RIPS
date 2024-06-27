@@ -184,7 +184,7 @@ def build_wnet(hp):
     output =  layers.Dense(1)(x)
     model = keras.Model(input_dat, output)
     opt = tf.keras.optimizers.Adam(learning_rate=hp['lr'], amsgrad=True)
-    model.compile(loss=polyMSE, optimizer=opt)
+    model.compile(loss=polyMSE, optimizer=opt) # compile configures the model for training
 
     return model  
     
@@ -199,13 +199,12 @@ def polyMSE(ytrue, ypred):
         ypred (list[float]): list of the predicted values
 
     Outputs:
-        tf.reduce_mean(mse(m1, m2)) (list[float]): gives the list of corresponding MSEs
-    '''
-                
+        (tf.float): gives the list of corresponding MSEs
+    '''               
     st =  2
     mx =  14
-    x = tf.where(ypred > 1e-6, ypred, 0)  #use obs mask
-    y = tf.where(ytrue > 1e-6, ytrue, 0) ## we only want to evaluate the function where we have data
+    x = tf.where(ypred > 1e-6, ypred, 0) # use obs mask
+    y = tf.where(ytrue > 1e-6, ytrue, 0) # we only want to evaluate the function where we have data
 
     aux = 0.
     m1 =  0.
@@ -223,7 +222,6 @@ def polyMSE(ytrue, ypred):
 class get_dts(): 
     '''
     Creates a class that will handle ndsts files    
-    
     '''
     
     def __init__(self, ndts =  1, nam = "def",  exp_out=1, batch_size = 32000, subsample=5):  
@@ -233,7 +231,7 @@ class get_dts():
         Inputs: 
             ndts (int): number of files to choose from, defaults to 1 (time step?)
             nam (str): the name of the data
-            exp_out (int): defaults to 1 (funni variable, NOT USED)
+            exp_out (int): defaults to 1 (NOT USED)
             batch_size (int): defaults to 32000
             subsample (int): defaults to 5, NOT USED
         '''
@@ -244,7 +242,14 @@ class get_dts():
         self.batch_size = batch_size 
         self.lev1 = 1 # lowest level
         self.lev2 = 72 # highest level
-        self.vars_in = ['T', 'PL', 'U', 'V', 'W', 'KM', 'RI', 'QV', 'QI', 'QL'] # variable names
+        self.vars_in = ['T', 'PL', 'U', 'V', 'W', 'KM', 'RI', 'QV', 'QI', 'QL'] 
+
+        # T: Temperature, PL: Pressure Level (or another pressure-related variable), U: U-component of wind (east-west direction)
+        # V: V-component of wind (north-south direction), W: Vertical velocity of wind
+        # KM: Turbulent Kinetic Energy, RI: Richardson number 
+        # QV: water vapor mixing ratio, QI: ice mixing ratio, QL: liquid water mixing ratio
+        # p5 in paper
+        
         self.means= [243.9, 0.6, 6.3, 0.013, 0.0002, 5.04, 21.8, 0.002, 9.75e-7, 7.87e-6] # hardcoded from G5NR based on 100 time steps
         self.stds =[30.3, 0.42, 16.1, 7.9, 0.05, 20.6, 20.8, 0.0036, 7.09e-6, 2.7e-5]
         self.surf_vars =  ['AIRD', 'KM', 'RI', 'QV']  ## surface variables: single-level approach- every single sample is for all features but for a given atmostpheric level- one value for each of those
@@ -258,13 +263,16 @@ class get_dts():
         #get nts files 
         self.fls = get_random_files(self.path_out, ndts)
    
+   
     def get_fls_batch(self, dt_batch_size):
         '''
+        Yields batches of filepaths from the list self.fls
+
         Inputs: 
             dt_batch_size (int): number of batches loaded at a time step (?) 
-        Output: 
-            self.fls[i:i + dt_batch_size] ()
             
+        Output: 
+            generator(list(str)): where the inner list is of length dt_batch_size (the last one may be cut off)
         '''
         for i in range(0, len(self.fls), dt_batch_size):
             yield self.fls[i:i + dt_batch_size]
@@ -273,13 +281,22 @@ class get_dts():
 
              
     def  get_data(self, this_fls):
-        ## gets and pre-processes the data
+        '''
+        
+        Inputs: 
+            this_fls (list[str]): list of file paths of size dt_batch_size
+
+        Outputs:
+            self.dat_in (xarray):
+            
+        '''
+        # gets and pre-processes the data
         self.dat_out =  xr.open_mfdataset(this_fls, chunks=self.chk, parallel=True)
         self.dat_out =  self.dat_out.coarsen(lat=8, lon=8, boundary="trim").std() #coarsen to about half degree using standard deviation as lumping function      
-        self.levs =  len(self.dat_out['lev'])
+        self.levs =  len(self.dat_out['lev']) # number of levels
         vars_in  = self.vars_in
-        self.n_features_in_ = len(vars_in)*self.levs
-        self.feats = len(vars_in)  
+        self.n_features_in_ = len(vars_in) * self.levs  
+        self.feats = len(vars_in) # overwrites it with the same thing?
         
         dat_in = []
         m=0
@@ -301,7 +318,7 @@ class get_dts():
         dat_in =  dat_in[['T', 'AIRD', 'U', 'V', 'W', 'KM', 'RI', 'QV', 'QI', 'QL']]  # ensure features are ordered correctly
         
         ### standardize inputs (make sure only time iss chunked)s
-        self.dat_in= xr.map_blocks(standardize, dat_in, kwargs={"m":self.means, "s": self.stds}, template=dat_in)
+        self.dat_in = xr.map_blocks(standardize, dat_in, kwargs={"m":self.means, "s": self.stds}, template=dat_in)
         dat_in.close()
            
     
