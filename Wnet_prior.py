@@ -323,6 +323,12 @@ class get_dts():
            
     
     def regrid_out(self, create_regridder = True): ## this is where they downsample the resolution if needed, safety check to ensure that it is on the exact same grid post-down-sampling
+        '''
+        Performs regridding: downsamples the resolution
+
+        Inputs:
+            create_regridder (bool): defaults to True
+        '''
         #regrid output
         if self.create_regridder:  
             self.regridder = xe.Regridder(self.dat_out, self.dat_in, 'bilinear', periodic=True) #make sure they are exactly the same grid 
@@ -330,8 +336,22 @@ class get_dts():
         self.dat_out =  self.regridder(self.dat_out)
    
       
-    def get_Xy(self, make_y_array =  True,  batch_size  =5120, test = False, x_reshape =False):
-    
+    def get_Xy(self, make_y_array =  True,  batch_size  = 5120, test = False, x_reshape =False):
+        '''
+        Sets up the data to be input into the Wnet_prior model. This includes 
+        standardizing input features, concatenating surface variables, and 
+        stacking the data.
+
+        Inputs:
+            make_y_array (bool): defaults to True, convert y into a NumPy array
+            batch_size (int): size of the data batches
+            test (bool): whether or not to use the self.fls files for testing
+            x_reshape (bool): whether to reshape the input covariates by variable
+
+        Outputs:
+            Xall (xarray.DataArray): The standardized and processed input features
+            yall (xarray.DataArray or numpy.ndarray): The processed target data
+        '''
         self.batch_size = batch_size
         if test:
             self.get_data(self.fls) 
