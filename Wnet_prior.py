@@ -280,7 +280,7 @@ class get_dts():
                 i = 0
 
              
-    def  get_data(self, this_fls):
+    def get_data(self, this_fls):
         '''
         
         Inputs: 
@@ -311,7 +311,7 @@ class get_dts():
                 dat_in =  xr.merge([dat_in, dat])#, join='exact') 
         dat.close()        
             
-        ###Calculate density 
+        ### Calculate density 
         dat_in = dat_in.unify_chunks()           
         da= xr.map_blocks(dens, dat_in, template=dat_in)
         dat_in = da.rename({"PL":"AIRD"})
