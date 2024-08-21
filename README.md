@@ -72,12 +72,6 @@ To use these files, minor changes will be need, such as ensuring all files are i
 This directory contains our investigation into preliminary model enhancements. The organization of the directory follows this pattern:
 
 ```
-comparison_metrics/
-|
-|-- data_retrieval.py
-|-- G5NR_analysis.py
-|-- MERRA_analysis.py
-
 model_enhancement/
 |
 |-- random_forest_inference.py
@@ -95,6 +89,15 @@ After that is done you can run the code within G5NR_analysis.py to construct all
 ## Comparison Metrics
 
 This directory contains the code used to produce the comparison metrics in our final report.
+
+It is organized as follows
+```
+comparison_metrics/
+|
+|-- data_retrieval.py
+|-- G5NR_analysis.py
+|-- MERRA_analysis.py
+```
 
 
 ## `wnet_prior.py`
