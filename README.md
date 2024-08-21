@@ -1,5 +1,4 @@
 # RIPS - NASA GSFC Summer 2024 Work
-All code provided in this repository is available at the github: https://github.com/IliaPopov-code/NASA-RIPS
 
 ## Overview
 
@@ -47,7 +46,7 @@ Within the folder, you'll find the saved model weights corresponding to each of 
 
 This directory contains the code used to run and compare wnet_prior models under different hyperparameters for sensitivity testing.
 
-The files are organized are as follows:
+The files are organized as follows:
 
 ```
 hyperparameter_testing/
