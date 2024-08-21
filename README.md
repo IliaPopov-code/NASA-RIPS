@@ -21,6 +21,25 @@ conda create --name <env> --file <this file>
 
 After setting up your Conda environment, run the jupyter notebooks within this repository. Make sure to install all the required dependencies and libraries into the Conda environment from the txt.
 
+## Confidence Intervals
+
+All code related to confidence intervals is found in the folder `confidence_intervals`. This code requires the datasets G5NR as well as observational datasets in order to be run. After saving the appropriate datasets, pass through the appropriate file paths throughout the notebooks. 
+
+### `residual_wild_bootstrapping.ipynb`
+
+This notebook produces confidence intervals based on the residual and wild bootstrapping technique as outlined by https://faculty.washington.edu/yenchic/17Sp_403/Lec6-bootstrap_reg.pdf. The code provided includes processing of provided data files, the computation of confidence intervals, calculation of the coverage rate, and code for plotting confidence intervals.
+
+Required inputs include G5NR data (accessible here: https://gmao.gsfc.nasa.gov/global_mesoscale/7km-G5NR/data_access/) that has already been preprocessed to have input variables `['T', 'PL', 'U', 'V', 'W', 'KM', 'RI', 'QV', 'QI', 'QL’]` according to the method outlined by Katherine H. Breen in the repository https://github.com/katherbreen/Wnet/tree/main. 
+
+### `pairs_bootstrapping_splitting_data.ipynb`
+
+This notebook provides code to split data that is necessary to run pairs bootstrapping for the model Wnet-prior. In this code, we provide methods to split the data into appropriate train, validation, and test sets using a 80/10/10 split. We then also provide code to resample with replacement from the training dataset based on set seeds. The resampled training datasets then can be used to train various Wnet-prior models that will be used as an ensemble to compute a confidence interval.
+
+### `pairs_bootstrapping.ipynb`
+
+This notebook provides code to compute and plot confidence intervals based on the pairs bootstrapping technique. This code assumes that there are 10-11 input models that have been trained on the previously resampled datasets. This code also assumes the availability of G5NR data. There are options to modify the appropriate file path in order to run the code. Then, it runs the models on provided test data to compute a confidence or prediction interval and save its plots.
+
+
 ## Ensemble model
 
 This notebook utilizes G5NR data to enhance the training of the Wnet Prior neural network model by employing a robust ensemble learning approach, specifically k-fold cross-validation. The process is designed to refine the model's generalization capabilities by dividing the dataset into 5 distinct folds, where each fold is used once as a validation set while the remaining folds form the training set. This method not only helps in mitigating overfitting but also provides a more comprehensive evaluation of the model's performance across different subsets of the data. Within the folder, you'll find the saved model weights corresponding to each of the 5 trained folds. After training, inference is performed for both the Wnet Prior Ensemble model, which aggregates the predictions from all folds, and the standard Wnet Prior model, serving as a baseline. The inference process is conducted across various levels, allowing for a detailed comparison of prediction accuracy and model performance at different stratifications. These comparisons are crucial in assessing the benefits of the ensemble approach over the traditional single-model inference, particularly in terms of capturing variability across levels.
