@@ -1,4 +1,5 @@
 # RIPS - NASA GSFC Summer 2024 Work
+All code provided in this repository is available at the github: https://github.com/IliaPopov-code/NASA-RIPS
 
 ## Overview
 
