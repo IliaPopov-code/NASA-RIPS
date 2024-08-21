@@ -69,8 +69,28 @@ To use these files, minor changes will be need, such as ensuring all files are i
 
 ## Model Development
 
-This directory contains our investigation into preliminary model enhancements.
-@ILIA PLZ ADD
+This directory contains our investigation into preliminary model enhancements. The organization of the directory follows this pattern:
+
+```
+comparison_metrics/
+|
+|-- data_retrieval.py
+|-- G5NR_analysis.py
+|-- MERRA_analysis.py
+
+model_enhancement/
+|
+|-- random_forest_inference.py
+|-- random_forest_training.py
+```
+
+In order to run the code properly the editing should follow this sequence:
+### Update the paths in data_retrieval.py
+As all files import the functions from this file, you should update the paths which go to MERRA and G5NR data, Wnet model, Wnet-prior model, and set up saving directories for the code to properly run.
+### Update the training of Random Forest in random_forest_training.py
+In order to retrain the Random Forest properly, the intrinsic information within the file needs to be updated. You can follow the instructions within the file to achieve this.
+
+After that is done you can run the code within G5NR_analysis.py to construct all the plots related to G5NR and MERRA_analysis.py, which perform Exploratory Data Analysis on the MERRA-2 dataset.
 
 ## Comparison Metrics
 
